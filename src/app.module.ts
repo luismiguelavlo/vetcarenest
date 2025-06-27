@@ -1,17 +1,18 @@
 import { Module } from '@nestjs/common';
 import { UserModule } from './user/user.module';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { envs } from './config/envs';
 
 @Module({
   imports: [
     UserModule,
     SequelizeModule.forRoot({
       dialect: 'postgres',
-      host: 'ep-flat-flower-a5khg3mq-pooler.us-east-2.aws.neon.tech',
-      port: 5432,
-      username: 'vetcaredb_owner',
-      password: 'npg_CuOX8ZUoWGs3',
-      database: 'vetcaredb',
+      host: envs.database_host,
+      port: envs.database_port,
+      username: envs.database_username,
+      password: envs.database_password,
+      database: envs.database_name,
       autoLoadModels: true,
       synchronize: true,
       //sync: { force: true },
