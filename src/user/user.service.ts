@@ -1,28 +1,91 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
+import { InjectModel } from '@nestjs/sequelize';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    console.log(createUserDto);
-    //TODO: crear la cuenta del usuario con los datos.
-    return 'This action adds a new user';
+  constructor(
+    @InjectModel(User)
+    private userModel: typeof User,
+  ) {}
+
+  async create(createUserDto: CreateUserDto) {
+    try {
+      const newUser = await this.userModel.create({
+        fullname: createUserDto.fullname,
+        email: createUserDto.email,
+        password: createUserDto.password,
+        phone_number: createUserDto.phone_number,
+      });
+
+      return newUser;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll() {
+    try {
+      return await this.userModel.findAll({
+        where: {
+          status: true,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    const user = await this.userModel.findOne({
+      where: {
+        status: true,
+        id: id,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.findOne(id);
+
+    try {
+      await user.update({
+        fullname: updateUserDto.fullname,
+        email: updateUserDto.email,
+        phone_number: updateUserDto.phone_number,
+      });
+      return user;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    const user = await this.findOne(id);
+
+    try {
+      await user.update({
+        status: false,
+      });
+      return user;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 }
