@@ -1,6 +1,8 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -10,6 +12,8 @@ import { InjectModel } from '@nestjs/sequelize';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger('UserService');
+
   constructor(
     @InjectModel(User)
     private userModel: typeof User,
@@ -26,8 +30,7 @@ export class UserService {
 
       return newUser;
     } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException('Internal Server Error');
+      this.handleDBException(error);
     }
   }
 
@@ -39,8 +42,7 @@ export class UserService {
         },
       });
     } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException('Internal Server Error');
+      this.handleDBException(error);
     }
   }
 
@@ -70,8 +72,7 @@ export class UserService {
       });
       return user;
     } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException('Internal Server Error');
+      this.handleDBException(error);
     }
   }
 
@@ -84,8 +85,16 @@ export class UserService {
       });
       return user;
     } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException('Internal Server Error');
+      this.handleDBException(error);
     }
+  }
+
+  private handleDBException(error: any) {
+    if (error.parent.code === '23505') {
+      throw new BadRequestException(error.parent.detail);
+    }
+
+    this.logger.error(error);
+    throw new InternalServerErrorException('Something went very wrong!');
   }
 }

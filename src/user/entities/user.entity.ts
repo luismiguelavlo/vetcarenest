@@ -13,6 +13,7 @@ export class User extends Model {
   @Column({
     type: DataType.STRING(70),
     allowNull: false,
+    unique: true,
   })
   email: string;
 
