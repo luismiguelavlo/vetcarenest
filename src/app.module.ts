@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { UserModule } from './user/user.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { envs } from './config/envs';
+import { PetModule } from './pet/pet.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { envs } from './config/envs';
         },
       },
     }),
+    PetModule,
   ],
   controllers: [],
   providers: [],

@@ -4,10 +4,12 @@ import {
   Column,
   DataType,
   Default,
+  HasMany,
   Model,
   PrimaryKey,
   Table,
 } from 'sequelize-typescript';
+import { Pet } from 'src/pet/entities/pet.entity';
 
 type UserRole = 'ADMIN' | 'CLIENT' | 'DOCTOR';
 
@@ -93,4 +95,7 @@ export class User extends Model {
     type: DataType.BOOLEAN,
   })
   status: boolean;
+
+  @HasMany(() => Pet)
+  pets: Pet[];
 }
