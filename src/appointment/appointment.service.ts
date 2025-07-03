@@ -9,6 +9,8 @@ import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { Appointment, AppointmentStatus } from './entities/appointment.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { UserService } from 'src/user/user.service';
+import { Pet } from 'src/pet/entities/pet.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class AppointmentService {
@@ -78,6 +80,17 @@ export class AppointmentService {
 
     return await this.appointmentModel.findAll({
       where: whereCondition,
+      include: [
+        {
+          model: Pet,
+          attributes: ['id', 'name', 'weight'],
+        },
+        {
+          model: User,
+          as: 'doctor',
+          attributes: ['id', 'fullname', 'email', 'phone_number'],
+        },
+      ],
     });
   }
 
