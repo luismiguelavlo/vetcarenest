@@ -90,7 +90,7 @@ export class UserService {
   }
 
   private handleDBException(error: any) {
-    if (error.parent.code === '23505') {
+    if (error?.parent?.code === '23505') {
       throw new BadRequestException(error.parent.detail);
     }
 

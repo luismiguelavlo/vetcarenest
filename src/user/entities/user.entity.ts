@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   AutoIncrement,
+  BeforeCreate,
+  BeforeUpdate,
   Column,
   DataType,
   Default,
@@ -102,4 +104,14 @@ export class User extends Model {
 
   @HasMany(() => Appointment)
   appointments: Appointment[];
+
+  @BeforeCreate
+  static async checkEmailBeforeCreate(user: User) {
+    user.dataValues.email = user.dataValues.email.toLowerCase().trim();
+  }
+
+  @BeforeUpdate
+  static checkEmailBeforeUpdate(user: User) {
+    user.dataValues.email = user.dataValues.email.toLowerCase().trim();
+  }
 }
