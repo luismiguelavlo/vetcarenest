@@ -9,6 +9,7 @@ import {
   PrimaryKey,
   Table,
 } from 'sequelize-typescript';
+import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { Pet } from 'src/pet/entities/pet.entity';
 
 type UserRole = 'ADMIN' | 'CLIENT' | 'DOCTOR';
@@ -98,4 +99,7 @@ export class User extends Model {
 
   @HasMany(() => Pet)
   pets: Pet[];
+
+  @HasMany(() => Appointment)
+  appointments: Appointment[];
 }

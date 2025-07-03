@@ -4,10 +4,12 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   PrimaryKey,
   Table,
 } from 'sequelize-typescript';
+import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { User } from 'src/user/entities/user.entity';
 
 @Table
@@ -26,7 +28,7 @@ export class Pet extends Model {
   weight: number;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.STRING(100),
     allowNull: false,
     unique: 'owner_name_unique_contraint',
   })
@@ -49,4 +51,7 @@ export class Pet extends Model {
 
   @BelongsTo(() => User)
   user: User;
+
+  @HasMany(() => Appointment)
+  appointments: Appointment[];
 }

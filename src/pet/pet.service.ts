@@ -10,6 +10,7 @@ import { UpdatePetDto } from './dto/update-pet.dto';
 import { Pet } from './entities/pet.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from 'src/user/entities/user.entity';
+import { Appointment } from 'src/appointment/entities/appointment.entity';
 
 @Injectable()
 export class PetService {
@@ -48,10 +49,23 @@ export class PetService {
         where: {
           status: true,
         },
-        include: {
-          model: User,
-          attributes: ['id', 'fullname', 'email', 'phone_number'],
-        },
+        include: [
+          {
+            model: User,
+            attributes: ['id', 'fullname', 'email', 'phone_number'],
+          },
+          {
+            model: Appointment,
+            attributes: ['id', 'date', 'reason'],
+            include: [
+              {
+                model: User,
+                as: 'doctor',
+                attributes: ['id', 'fullname', 'email', 'phone_number'],
+              },
+            ],
+          },
+        ],
       });
     } catch (error) {
       this.handleDBException('Something went very wrong!');
