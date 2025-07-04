@@ -4,11 +4,16 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { InjectModel } from '@nestjs/sequelize';
+import * as bcrypt from 'bcrypt';
+import { LoginUserDto } from './dto/login-user.dto';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
@@ -17,18 +22,60 @@ export class UserService {
   constructor(
     @InjectModel(User)
     private userModel: typeof User,
+
+    private readonly jwtService: JwtService,
   ) {}
+
+  async login(loginUserDto: LoginUserDto) {
+    const { email, password } = loginUserDto;
+
+    const user = await this.userModel.findOne({
+      where: {
+        email: email,
+        status: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    if (!bcrypt.compareSync(password, user.dataValues.password)) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    return {
+      token: this.getJwtToken({
+        id: user.id,
+      }),
+      user: {
+        id: user.id,
+        fullname: user.dataValues.fullname,
+        email: user.dataValues.email,
+        phone_number: user.dataValues.phone_number,
+        rol: user.dataValues.rol,
+      },
+    };
+  }
 
   async create(createUserDto: CreateUserDto) {
     try {
       const newUser = await this.userModel.create({
         fullname: createUserDto.fullname,
         email: createUserDto.email,
-        password: createUserDto.password,
+        password: bcrypt.hashSync(createUserDto.password, 12),
         phone_number: createUserDto.phone_number,
       });
 
-      return newUser;
+      return {
+        user: {
+          id: newUser.id,
+          fullname: newUser.dataValues.fullname,
+          email: newUser.dataValues.email,
+          phone_number: newUser.dataValues.phone_number,
+          rol: newUser.dataValues.rol,
+        },
+      };
     } catch (error) {
       this.handleDBException(error);
     }
@@ -87,6 +134,11 @@ export class UserService {
     } catch (error) {
       this.handleDBException(error);
     }
+  }
+
+  private getJwtToken(payload: JwtPayload) {
+    const token = this.jwtService.sign(payload);
+    return token;
   }
 
   private handleDBException(error: any) {
