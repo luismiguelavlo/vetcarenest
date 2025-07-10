@@ -82,12 +82,12 @@ export class User extends Model {
     description: 'password of user',
     enum: ['CLIENT', 'ADMIN', 'DOCTOR'],
   })
-  @Default('CLIENT')
+  @Default(['CLIENT'])
   @Column({
-    type: DataType.ENUM('CLIENT', 'ADMIN', 'DOCTOR'),
+    type: DataType.ARRAY(DataType.ENUM('CLIENT', 'ADMIN', 'DOCTOR')),
     allowNull: false,
   })
-  rol: UserRole;
+  rol: UserRole[];
 
   @ApiProperty({
     example: 'true',

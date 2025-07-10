@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
+  SetMetadata,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -15,6 +17,11 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
 import { LoginUserDto } from './dto/login-user.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from './decorators/get-user.decorator';
+import { UserRolGuard } from './guards/user-rol/user-rol.guard';
+import { RolProtected } from './decorators/rol-protected.decorator';
+import { ValidRoles } from './interfaces/valid-roles';
+import { Auth } from './decorators/auth.decorator';
 
 @ApiTags('Users')
 @Controller('user')
@@ -61,8 +68,10 @@ export class UserController {
   }
 
   @Get('route/private')
-  @UseGuards(AuthGuard())
-  privateRoute() {
+  @Auth(ValidRoles.DOCTOR, ValidRoles.CLIENT)
+  privateRoute(
+    @GetUser() user: User /*@GetUser('fullname') userName: string*/,
+  ) {
     return {
       ok: true,
       message: 'This is a private route',
