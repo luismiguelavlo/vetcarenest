@@ -42,6 +42,7 @@ export class UserController {
 
   @Get()
   @ApiResponse({ status: 200, description: 'List Users' })
+  @Auth(ValidRoles.ADMIN, ValidRoles.DOCTOR)
   findAll() {
     return this.userService.findAll();
   }
@@ -49,13 +50,22 @@ export class UserController {
   @Get(':id')
   @ApiResponse({ status: 200, description: 'Get one user' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  @Auth()
+  async findOne(@Param('id') id: string) {
+    const user = await this.userService.findOne(+id);
+    return {
+      id: user.dataValues.id,
+      fullname: user.dataValues.fullname,
+      email: user.dataValues.email,
+      phone_number: user.dataValues.phone_number,
+      rol: user.dataValues.rol,
+    };
   }
 
   @Patch(':id')
   @ApiResponse({ status: 200, description: 'Update User' })
   @ApiResponse({ status: 404, description: 'User not found' })
+  @Auth(ValidRoles.ADMIN)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);
   }
@@ -63,6 +73,7 @@ export class UserController {
   @Delete(':id')
   @ApiResponse({ status: 200, description: 'Delete User' })
   @ApiResponse({ status: 404, description: 'User not found' })
+  @Auth(ValidRoles.ADMIN)
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }

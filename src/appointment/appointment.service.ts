@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -11,6 +12,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { UserService } from 'src/user/user.service';
 import { Pet } from 'src/pet/entities/pet.entity';
 import { User } from 'src/user/entities/user.entity';
+import { PetService } from 'src/pet/pet.service';
+import { ValidRoles } from 'src/user/interfaces/valid-roles';
 
 @Injectable()
 export class AppointmentService {
@@ -20,12 +23,19 @@ export class AppointmentService {
     @InjectModel(Appointment)
     private appointmentModel: typeof Appointment,
     private readonly userService: UserService,
+    private readonly petService: PetService,
   ) {}
 
-  async create(createAppointmentDto: CreateAppointmentDto) {
+  async create(createAppointmentDto: CreateAppointmentDto, sessionUser: User) {
+    const pet = await this.petService.findOne(createAppointmentDto.petId);
+
+    if (pet.dataValues.owner !== sessionUser.id) {
+      throw new ForbiddenException('You are not the owner of this pet');
+    }
+
     const user = await this.userService.findOne(createAppointmentDto.userId);
 
-    if (user.dataValues.rol !== 'DOCTOR') {
+    if (!user.dataValues.rol.includes(ValidRoles.DOCTOR)) {
       throw new BadRequestException(
         'The user is not a doctor, cannot create an appointment.',
       );
