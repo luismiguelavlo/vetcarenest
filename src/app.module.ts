@@ -4,10 +4,20 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { envs } from './config/envs';
 import { PetModule } from './pet/pet.module';
 import { AppointmentModule } from './appointment/appointment.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
     UserModule,
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 2000,
+        },
+      ],
+    }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: envs.database_host,
@@ -29,6 +39,11 @@ import { AppointmentModule } from './appointment/appointment.module';
     AppointmentModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
