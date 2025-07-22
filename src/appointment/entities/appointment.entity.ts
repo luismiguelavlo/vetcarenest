@@ -17,7 +17,10 @@ export enum AppointmentStatus {
   CANCELLED = 'cancelled',
 }
 
-@Table
+@Table({
+  tableName: 'appointment',
+  timestamps: true,
+})
 export class Appointment extends Model {
   @PrimaryKey
   @AutoIncrement

@@ -9,6 +9,7 @@ import {
   UseGuards,
   Req,
   SetMetadata,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -22,6 +23,7 @@ import { UserRolGuard } from './guards/user-rol/user-rol.guard';
 import { RolProtected } from './decorators/rol-protected.decorator';
 import { ValidRoles } from './interfaces/valid-roles';
 import { Auth } from './decorators/auth.decorator';
+import { ParseBoolPipe } from '@nestjs/common';
 
 @ApiTags('Users')
 @Controller('user')
@@ -42,9 +44,12 @@ export class UserController {
 
   @Get()
   @ApiResponse({ status: 200, description: 'List Users' })
-  @Auth(ValidRoles.ADMIN, ValidRoles.DOCTOR)
-  findAll() {
-    return this.userService.findAll();
+  //@Auth(ValidRoles.ADMIN, ValidRoles.DOCTOR)
+  findAll(
+    @Query('status', ParseBoolPipe) status?: boolean,
+    @Query('id') id?: string,
+  ) {
+    return this.userService.findAll(status, id);
   }
 
   @Get(':id')

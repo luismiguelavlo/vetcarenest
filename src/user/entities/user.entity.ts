@@ -16,7 +16,10 @@ import { Pet } from 'src/pet/entities/pet.entity';
 
 type UserRole = 'ADMIN' | 'CLIENT' | 'DOCTOR';
 
-@Table
+@Table({
+  tableName: 'user',
+  timestamps: true,
+})
 export class User extends Model {
   @ApiProperty({
     example: '1',

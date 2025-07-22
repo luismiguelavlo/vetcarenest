@@ -14,12 +14,14 @@ import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { JwtService } from '@nestjs/jwt';
+import { Sequelize } from 'sequelize-typescript';
 
 @Injectable()
 export class UserService {
   private readonly logger = new Logger('UserService');
 
   constructor(
+    private readonly sequelize: Sequelize,
     @InjectModel(User)
     private userModel: typeof User,
 
@@ -81,16 +83,17 @@ export class UserService {
     }
   }
 
-  async findAll() {
-    try {
-      return await this.userModel.findAll({
-        where: {
-          status: true,
+  async findAll(status: boolean = true, id: string = '1') {
+    const [users] = await this.sequelize.query(
+      `SELECT * FROM "user" WHERE status = :status AND id = :id`,
+      {
+        replacements: {
+          status: status,
+          id: id,
         },
-      });
-    } catch (error) {
-      this.handleDBException(error);
-    }
+      },
+    );
+    return users;
   }
 
   async findOne(id: number) {

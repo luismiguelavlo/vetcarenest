@@ -12,7 +12,10 @@ import {
 import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { User } from 'src/user/entities/user.entity';
 
-@Table
+@Table({
+  tableName: 'pet',
+  timestamps: true,
+})
 export class Pet extends Model {
   @PrimaryKey
   @AutoIncrement
