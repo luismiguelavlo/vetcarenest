@@ -30,6 +30,13 @@ import { ParseBoolPipe } from '@nestjs/common';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get('health')
+  health() {
+    return {
+      message: 'service ok!',
+    };
+  }
+
   @Post('register')
   @ApiResponse({ status: 201, description: 'User was created', type: User })
   @ApiResponse({ status: 400, description: 'Bad Request' })
