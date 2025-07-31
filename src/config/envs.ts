@@ -9,6 +9,11 @@ interface EnvVar {
   DATABASE_PORT: number;
   DATABASE_NAME: string;
   JWT_SECRET: string;
+
+  AWS_ACCESS_KEY: string;
+  AWS_SECRET_KEY: string;
+  AWS_REGION: string;
+  AWS_BUCKET_NAME: string;
 }
 
 const envSchema = joi
@@ -20,6 +25,11 @@ const envSchema = joi
     DATABASE_PORT: joi.number().required(),
     DATABASE_NAME: joi.string().required(),
     JWT_SECRET: joi.string().required(),
+
+    AWS_ACCESS_KEY: joi.string().required(),
+    AWS_SECRET_KEY: joi.string().required(),
+    AWS_REGION: joi.string().required(),
+    AWS_BUCKET_NAME: joi.string().required(),
   })
   .unknown(true);
 
@@ -41,4 +51,9 @@ export const envs = {
   database_port: envVars.DATABASE_PORT,
   database_name: envVars.DATABASE_NAME,
   jwt_secret: envVars.JWT_SECRET,
+
+  aws_access_key: envVars.AWS_ACCESS_KEY,
+  aws_secret_key: envVars.AWS_SECRET_KEY,
+  aws_region: envVars.AWS_REGION,
+  aws_bucket_name: envVars.AWS_BUCKET_NAME,
 };

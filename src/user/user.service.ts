@@ -126,6 +126,19 @@ export class UserService {
     }
   }
 
+  async updateUserFile(id: number, path: string) {
+    const user = await this.findOne(id);
+
+    try {
+      await user.update({
+        photo_url: path,
+      });
+      return user;
+    } catch (error) {
+      this.handleDBException(error);
+    }
+  }
+
   async remove(id: number) {
     const user = await this.findOne(id);
 

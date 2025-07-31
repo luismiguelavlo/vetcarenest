@@ -6,6 +6,7 @@ import { PetModule } from './pet/pet.module';
 import { AppointmentModule } from './appointment/appointment.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { APP_GUARD } from '@nestjs/core';
     }),
     PetModule,
     AppointmentModule,
+    FilesModule,
   ],
   controllers: [],
   providers: [
